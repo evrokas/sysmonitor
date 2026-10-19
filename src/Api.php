@@ -27,6 +27,26 @@ class Api
         $now = $now ?? time();
         try {
             $this->authorize($headers, $https);
+            return $this->dispatch($query, $now);
+        } catch (ApiError $e) {
+            return [$e->status, ['error' => $e->getMessage()]];
+        } catch (\Throwable $e) {
+            error_log('sysmonitor api: ' . $e->getMessage());
+            return [500, ['error' => 'internal error']];
+        }
+    }
+
+    /**
+     * The same actions without authentication or HTTPS checks, for in-process
+     * callers (a dashboard on the same machine reading the local database).
+     * Never expose this to a request: it is the caller's job to be trusted.
+     *
+     * @return array{0:int,1:array}
+     */
+    public function dispatch(array $query, ?int $now = null): array
+    {
+        $now = $now ?? time();
+        try {
             $store = $this->store ?? Store::open($this->cfg->get('db_path'), true);
             switch ($query['action'] ?? 'info') {
                 case 'info':

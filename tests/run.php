@@ -234,6 +234,9 @@ check('instance filter is parameterised', $c === 200 && $b['series'] === []);
 [$c, $b] = $api->handle(['action' => 'query', 'metric' => 'temp.c', 'from' => (string)($now - 60), 'to' => (string)($now + 1), 'bucket' => '0'], $auth, true, $now);
 check('raw query returns the point', $c === 200 && $b['series'][0]['points'][0][1] == 55.0);
 [$c, ] = $api->handle(['action' => 'drop'], $auth, true, $now); check('unknown action 400', $c === 400);
+[$c, $b] = $api->dispatch(['action' => 'summary'], $now);
+check('dispatch (in-process) needs no token and matches handle()', $c === 200 && $b === $api->handle(['action' => 'summary'], $auth, true, $now)[1]);
+[$c, ] = $api->dispatch(['action' => 'query', 'metric' => 'nope'], $now); check('dispatch still validates', $c === 400);
 $ro = Store::open("$rdir/r.sqlite", true);
 try { $ro->pdo->exec('DELETE FROM samples'); check('read-only connection cannot write', false); } catch (\Throwable $e) { check('read-only connection cannot write', true); }
 
