@@ -1,0 +1,10 @@
+[Unit]
+Description=sysmonitor collection pass
+
+[Service]
+Type=oneshot
+# Run as the user that owns the data directory; add the web user to its group for the API.
+User=sysmon
+Group=sysmon
+UMask=0007
+ExecStart=/usr/bin/php /opt/sysmonitor/bin/tick.php

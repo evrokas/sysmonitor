@@ -1,0 +1,10 @@
+[Unit]
+Description=Run sysmonitor every minute
+
+[Timer]
+OnCalendar=minutely
+AccuracySec=1s
+Persistent=false
+
+[Install]
+WantedBy=timers.target

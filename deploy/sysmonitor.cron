@@ -1,0 +1,2 @@
+# /etc/cron.d/sysmonitor -- alternative to the systemd timer
+* * * * * sysmon /usr/bin/php /opt/sysmonitor/bin/tick.php >/dev/null 2>>/var/log/sysmonitor.err
