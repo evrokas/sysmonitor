@@ -196,6 +196,14 @@ catch (Sysmon\ApiError $e) { check('misaligned old bucket rejected', true); }
 $rs->rollup($now + 600); $rs->rollup($now + 600);
 $cmp('rollup is idempotent', $now - 5 * 86400, $now + 1, 3600);
 
+// ---------- file mode: the web user must be able to share the WAL files ----------
+$old = umask(0027);
+$mdir = tmpdir(); Store::open("$mdir/m.sqlite");
+$perm = fileperms("$mdir/m.sqlite") & 0777;
+umask($old);
+check('database is group-readable and writable whatever the umask', ($perm & 0060) === 0060, sprintf('%o', $perm));
+check('database is not opened up to everyone else', ($perm & 0007) === 0, sprintf('%o', $perm));
+
 // ---------- API ----------
 $token = 'secret-token-123';
 $acfg = new Config(['db_path' => "$rdir/r.sqlite", 'api_tokens' => [hash('sha256', $token)], 'host_name' => 'testbox', 'retention_days' => $days, 'max_points' => 1000]);

@@ -23,6 +23,8 @@ A small system monitor for Linux and Windows machines, in plain PHP (no composer
 
 A source that does not exist (VMs, many Windows boards) simply produces no samples. **Windows temperature and fans are best-effort**: most desktop and server boards do not expose them to a normal process.
 
+**Step-by-step install for the server and for Linux/Windows clients: [docs/INSTALL.md](docs/INSTALL.md).** The sections below are a summary.
+
 ## Install (Linux)
 
 ```

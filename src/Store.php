@@ -35,6 +35,15 @@ class Store
             $pdo->exec('PRAGMA journal_mode=WAL');
             $pdo->exec('PRAGMA synchronous=NORMAL');
             $s->migrate();
+            // SQLite gives the -wal/-shm files the database file's mode, whoever creates them. The API (web
+            // user) is often the one that recreates them after a tick, so the file must be group-writable or
+            // the collector later fails with "attempt to write a readonly database". Needs a shared group.
+            clearstatcache(true, $path);
+            $mode = @fileperms($path);
+            if ($mode !== false && ($mode & 0060) !== 0060) {
+                @chmod($path, ($mode & 0777) | 0060);
+                clearstatcache(true, $path);
+            }
         }
         return $s;
     }
